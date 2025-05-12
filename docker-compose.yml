@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: fastapi_db
+      POSTGRES_USER: fastapi_db_admin
+      POSTGRES_PASSWORD: Admin123
+    volumes:
+      - postgres_data:/var/lib/postgres/data
+    ports:
+      - "5433:5432"
+
+  web:
+    build: .
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://fastapi_db_admin:Admin123@db:5432/fastapi_db
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
